@@ -4,16 +4,19 @@ import random
 from math import inf
 
 
-def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 100000):
+def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 1000):
 	# policy_map = {state : action from state under policy}
-	policy_map = {state : random.choice(mpd.action_space(state)) for state in mdp.state_space()}
+	policy_map = {state : rand_choice(mdp.action_space(state)) for state in mdp.state_space()}
 
 	# q_val_map = {(state, action):(state-action average return, number of times state-action visited)
-	q_val_map = {(state, action):(0,0) for action in mdp.action_space(state) for state in mpd.state_space()}
+	q_val_map = {}
+	for state in mdp.state_space():
+		for action in mdp.action_space(state):
+			q_val_map[(state, action)] = (0,0)
 	
 	for i in range(num_episodes):
 		# episode is a list of form [state_0, action_0, reward_1, ... , state_t-1, action_t-1, reward_t]
-		episode, episode_length = gen_episode(mpd, init_state, init_action, max_episode_length)
+		episode, episode_length = gen_episode(mdp, policy_map, max_episode_length)
 
 		G = 0
 
@@ -39,18 +42,18 @@ def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 10
 
 
 
-def gen_episode(mpd, max_episode_length):
+def gen_episode(mdp, policy_map, max_episode_length):
 
 	# randomly choose initial state, action
-	state = random.choice(mdp.state_space(initial=True))
-	action = random.choice(mpd.action_space(state))
+	state = rand_choice(mdp.state_space(initial=True))
+	action = rand_choice(mdp.action_space(state))
 
 	# episode so far
 	episode = []
 	# episode length so far (number of time-steps, not directly length of episode list)
 	episode_length = 0
 
-	while (episode_length < len(max_episode_length)) and (not mpd.terminal_state(state)):
+	while (episode_length < max_episode_length) and (not mdp.terminal_state(state)):
 		episode.append(state)
 		episode.append(action)
 		state, reward = mdp.successor(state, action)
@@ -89,7 +92,10 @@ def max_action(q_val_map, state, mdp):
 
 
 
-
+def rand_choice(ls):
+	if not ls:
+		return None
+	return random.choice(ls)
 
 
 
