@@ -4,14 +4,14 @@ import random
 from math import inf
 
 
-def monte_carlo(mdp, discount = .9, max_episode_length = 1000, max_episodes = 100000):
+def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 100000):
 	# policy_map = {state : action from state under policy}
 	policy_map = {state : random.choice(mpd.action_space(state)) for state in mdp.state_space()}
 
 	# q_val_map = {(state, action):(state-action average return, number of times state-action visited)
 	q_val_map = {(state, action):(0,0) for action in mdp.action_space(state) for state in mpd.state_space()}
 	
-	for i in range(max_episodes):
+	for i in range(num_episodes):
 		# episode is a list of form [state_0, action_0, reward_1, ... , state_t-1, action_t-1, reward_t]
 		episode, episode_length = gen_episode(mpd, init_state, init_action, max_episode_length)
 
