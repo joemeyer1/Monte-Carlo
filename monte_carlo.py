@@ -4,7 +4,7 @@ import random
 from math import inf
 
 
-def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 1000):
+def monte_carlo(mdp, discount = .8, epsilon = .2, max_episode_length = 10000, num_episodes = 1000):
 	# policy_map = {state : action from state under policy}
 	policy_map = {state : rand_choice(mdp.action_space(state)) for state in mdp.state_space()}
 
@@ -16,7 +16,7 @@ def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 10
 	
 	for i in range(num_episodes):
 		# episode is a list of form [state_0, action_0, reward_1, ... , state_t-1, action_t-1, reward_t]
-		episode, episode_length = gen_episode(mdp, policy_map, max_episode_length)
+		episode, episode_length = gen_episode(mdp, policy_map, max_episode_length, epsilon)
 
 		G = 0
 
@@ -42,7 +42,7 @@ def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 10
 
 
 
-def gen_episode(mdp, policy_map, max_episode_length):
+def gen_episode(mdp, policy_map, max_episode_length, epsilon):
 
 	# randomly choose initial state, action
 	state = rand_choice(mdp.state_space(initial=True))
@@ -58,10 +58,19 @@ def gen_episode(mdp, policy_map, max_episode_length):
 		episode.append(action)
 		state, reward = mdp.successor(state, action)
 		episode.append(reward)
-		action = policy_map[state]
+		action = compute_action(mdp, policy_map, state, epsilon)
 		episode_length += 1
 
 	return episode, episode_length
+
+
+# helper for gen_episode
+def compute_action(mdp, policy_map, state, epsilon):
+	if flip_coin(epsilon):
+		return rand_choice(mdp.action_space(state))
+	else:
+		return policy_map[state]
+
 
 
 
@@ -98,7 +107,10 @@ def rand_choice(ls):
 	return random.choice(ls)
 
 
-
+# flips a weighted bool coin (P(1) =: p)
+def flip_coin( p ):
+    r = random.random()
+    return r < p
 
 
 
