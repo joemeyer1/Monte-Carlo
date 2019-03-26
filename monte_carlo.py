@@ -31,6 +31,7 @@ def monte_carlo(mdp, discount = .9, max_episode_length = 1000, num_episodes = 10
 				q_val = value_avg + ((1. / episode_length) * (reward - value_avg))
 				#update q map
 				q_val_map[(state, action)] = (q_val, times_visited + 1)
+				# update policy_map
 				policy_map[state] = max_action(q_val_map, state, mdp)
 
 	return policy_map, q_val_map
