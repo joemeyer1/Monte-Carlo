@@ -25,13 +25,13 @@ def print_episode_states(episode=print_episode()[0]):
 	rwd = episode[-1]
 	return states, rwd
 
-def avg_reward(episodes = 10, runs = 1):
+def avg_reward(runs = 2, episodes = 1):
+	tot_rwd = 0
 	for r in range(runs):
 		run()
-		tot_rwd = 0
 		for i in range(episodes):
 			tot_rwd += print_episode_states()[1]
-		return tot_rwd/float(episodes)
+	return tot_rwd/float(episodes*runs)
 
 
 
