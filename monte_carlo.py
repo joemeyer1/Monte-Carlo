@@ -4,7 +4,7 @@ import random
 from math import inf
 
 
-def monte_carlo(mdp, discount = .99, epsilon = .5, max_episode_length = 8, num_episodes = 10000):
+def monte_carlo(mdp, discount = .99, epsilon = .3, max_episode_length = 8, num_episodes = 10000):
 	# policy_map = {state : action from state under policy}
 	policy_map = {state : rand_choice(mdp.action_space(state)) for state in mdp.state_space(non_terminal=True)}
 
