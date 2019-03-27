@@ -4,9 +4,9 @@ import random
 from math import inf
 
 
-def monte_carlo(mdp, discount = .8, epsilon = .2, max_episode_length = 10000, num_episodes = 1000):
+def monte_carlo(mdp, discount = .99, epsilon = .5, max_episode_length = 8, num_episodes = 10000):
 	# policy_map = {state : action from state under policy}
-	policy_map = {state : rand_choice(mdp.action_space(state)) for state in mdp.state_space()}
+	policy_map = {state : rand_choice(mdp.action_space(state)) for state in mdp.state_space(non_terminal=True)}
 
 	# q_val_map = {(state, action):(state-action average return, number of times state-action visited)
 	q_val_map = {}
@@ -44,9 +44,14 @@ def monte_carlo(mdp, discount = .8, epsilon = .2, max_episode_length = 10000, nu
 
 def gen_episode(mdp, policy_map, max_episode_length, epsilon):
 
+
 	# randomly choose initial state, action
 	state = rand_choice(mdp.state_space(initial=True))
-	action = rand_choice(mdp.action_space(state))
+	if epsilon > 0:
+		action = rand_choice(mdp.action_space(state))
+	else:
+	# ow we want a greedy run
+		action = compute_action(mdp, policy_map, state, epsilon)
 
 	# episode so far
 	episode = []
@@ -58,7 +63,9 @@ def gen_episode(mdp, policy_map, max_episode_length, epsilon):
 		episode.append(action)
 		state, reward = mdp.successor(state, action)
 		episode.append(reward)
-		action = compute_action(mdp, policy_map, state, epsilon)
+		if not mdp.terminal_state(state):
+			action = compute_action(mdp, policy_map, state, epsilon)
+
 		episode_length += 1
 
 	return episode, episode_length
@@ -92,11 +99,13 @@ def max_action(q_val_map, state, mdp):
 
 	for action in mdp.action_space(state):
 		q_val, _ = q_val_map[(state, action)]
-		if q_val > best_value:
-			best_action = action
+		if q_val == best_value:
+			best_action.append(action)
+		elif q_val > best_value:
+			best_action = [action]
 			best_value = q_val
 
-	return best_action
+	return random.choice(best_action)
 
 
 
@@ -108,7 +117,7 @@ def rand_choice(ls):
 
 
 # flips a weighted bool coin (P(1) =: p)
-def flip_coin( p ):
+def flip_coin(p):
     r = random.random()
     return r < p
 
