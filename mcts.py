@@ -54,7 +54,19 @@ def update(node, result, policy):
 def rand_unvisited(tree):
 	return random.choice(tree.action_space(unvisited=True))
 
-# helper for main
+# helpers for main
 # TODO
 def check_finish(tree):
 	pass
+
+
+def initialize_policy():
+	pass
+
+
+
+
+
+
+
+
