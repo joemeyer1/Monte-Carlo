@@ -7,11 +7,11 @@ import random
 
 
 def main(tree, end_condition):
-	policy = initialize_policy()
+	policy = initialize_policy(tree)
 	while not end_condition:
-		tree = select(tree, policy, end_condition)
-		result = expand(tree, end_condition)
-		result = simulate(tree, result, policy)
+		result = select(tree, policy, end_condition)
+		result = expand(result, end_condition)
+		result = simulate(result, policy, end_condition)
 		backup(tree, result, policy)
 		end_condition = check_finish(tree)
 
@@ -38,17 +38,12 @@ def simulate(tree, policy, end_condition):
 
 # update node with result
 def backup(node, result, policy)
-	update(node, result, policy)
-
-
-
-
-
-
-
-# helper for backup
-def update(node, result, policy):
 	policy.update(node, result)
+
+
+
+	
+	
 
 # helper for expand
 def rand_unvisited(tree):
