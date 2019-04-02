@@ -52,7 +52,7 @@ terminal_state = SMALL_TERMINAL
 
 class Maze:
 	def __init__(self, maze = maze, init_states = [INITIAL_STATE], end_state = terminal_state):
-		self.maze = SMALL_MAZE
+		self.maze = maze
 		self.init_states = init_states
 		self.end_states = [end_state]
 
