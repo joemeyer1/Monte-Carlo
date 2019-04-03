@@ -55,7 +55,7 @@ def check_finish(tree):
 	pass
 
 
-def initialize_policy():
+def initialize_policy(tree):
 	pass
 
 
