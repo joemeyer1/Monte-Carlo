@@ -1,2 +1,2 @@
 # Monte-Carlo
-simple monte carlo implementation (currently tabular; I hope to implement a gradient/deep-rl version later)
+Simple tabular monte carlo implementation. Pseudocode for MCTS also included. TODO: Adapt MCTS pseudocode for gradient RL
