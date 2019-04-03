@@ -1,7 +1,7 @@
 
 
 
-# so far just pseudocode
+# so far just general pseudocode
 
 import random
 
