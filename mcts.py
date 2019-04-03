@@ -56,8 +56,20 @@ def check_finish(tree):
 
 
 def initialize_policy(tree):
+	# this depends on whether it's tabular or gradient
 	pass
 
+
+
+class Policy:
+	def __init__(self):
+		pass
+
+	def __call__(node):
+		pass
+
+	def update(self, node, result):
+		pass
 
 
 
