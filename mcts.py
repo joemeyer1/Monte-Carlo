@@ -12,7 +12,7 @@ def main(tree, end_condition):
 		result = select(tree, policy, end_condition)
 		result = expand(result, end_condition)
 		result = simulate(result, policy, end_condition)
-		backup(tree, result, policy)
+		tree = backup(tree, result, policy)
 		end_condition = check_finish(tree)
 
 
