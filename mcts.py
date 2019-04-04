@@ -65,7 +65,7 @@ class Policy:
 	def __init__(self):
 		pass
 
-	def __call__(node):
+	def __call__(self, node):
 		pass
 
 	def update(self, node, result):
