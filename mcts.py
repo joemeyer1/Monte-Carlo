@@ -5,15 +5,18 @@
 
 import random
 
+# end_condition_mcts: when to stop improving policy (i.e. performance is good enough)
+# end_condition_select: when a leaf is reached (all children unvisited)
+# end_condition_sim: when to end episode (i.e. max episode length or terminal state reached)
 
-def main(tree, end_condition):
+def main(tree, end_condition_mcts, end_condition_select, end_condition_sim):
 	policy = initialize_policy(tree)
-	while not end_condition:
-		result = select(tree, policy, end_condition)
-		result = expand(result, end_condition)
-		result = simulate(result, policy, end_condition)
+	while not end_condition_mcts:
+		result = select(tree, policy, end_condition_select)
+		result = expand(result, end_condition_select)
+		result = simulate(result, policy, end_condition_sim)
 		tree = backup(tree, result, policy)
-		end_condition = check_finish(tree)
+		end_condition_mcts = check_finish(tree)
 
 
 # traverse tree to select leaf
