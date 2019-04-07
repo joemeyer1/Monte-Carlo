@@ -46,7 +46,7 @@ def sum_from_tp1(t, episode_length, rwd_vec):
 def gen_episode(mdp, policy, max_episode_length):
 	# randomly choose initial state, action
 	state = rand_choice(mdp.state_space(initial=True))
-	action = policy.predict(state)
+	action = max_action(policy.predict(state))
 
 	# episode so far
 	episode = []
@@ -59,7 +59,7 @@ def gen_episode(mdp, policy, max_episode_length):
 		state, reward = mdp.successor(state, action)
 		episode.append(reward)
 		if not mdp.terminal_state(state):
-			action = policy.predict(state)
+			action = max_action(policy.predict(state))
 
 		episode_length += 1
 
@@ -91,9 +91,10 @@ def gradient_of(equation, point):
 	return x.grad
 
 # returns P(action | policy, policy_params, state)
-def prob_under_policy(policy, action, state, policy_params)
-	# TODO
-	pass
+def prob_under_policy(policy, action, state)
+	action_vec = policy.predict(state)
+	action_index = index_of(action)
+	return action_vec[action_index]
 
 
 # sets policy params to 'policy_params'
@@ -102,9 +103,26 @@ def update_policy(policy, policy_params):
 	pass
 
 
+# returns integer index corresponding w best action
+def max_action(action_vec):
+	best_action = None
+	best_value = -inf
+
+	for i in range(action_vec):
+		val = action_vec[i]
+		if val == best_value:
+			best_action.append(action)
+		elif val > best_value:
+			best_action = [action]
+			best_value = val
+
+	return random.choice(best_action)
 
 
-
+# returns integer index corresponding w action
+def index_of(action):
+	# TODO
+	pass
 
 
 
