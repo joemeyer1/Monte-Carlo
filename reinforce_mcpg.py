@@ -84,9 +84,11 @@ def parse_episode(episode):
 	return torch.tensor(rwd_vec), torch.tensor(action_vec), torch.tensor(state_vec)
 
 # return gradient of equation (use autograd)
-def gradient_of(equation):
-	# TODO
-	pass
+def gradient_of(equation, point):
+	x = torch.tensor(point, requires_grad=True)
+	y = equation(x)
+	y.backward()
+	return x.grad
 
 # returns P(action | policy, policy_params, state)
 def prob_under_policy(policy, action, state, policy_params)
