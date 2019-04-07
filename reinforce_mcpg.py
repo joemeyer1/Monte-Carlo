@@ -26,6 +26,8 @@ def reinforce(mdp, policy, step_size, discount, num_params = 2**8, num_episodes=
 		for t in range(episode_length):
 			G, action_t, state_t = sum_from_tp1(t, episode_length, rwd_vec, discount_vec)
 			policy_params += step_size * (discount**t) * G * gradient_of( math.log( prob_under(policy, action_t, state_t, policy_params) ) )
+			update_policy(policy, policy_params)
+
 
 	return policy, policy_params
 
@@ -38,10 +40,31 @@ def sum_from_tp1(t, episode_length, rwd_vec):
 	discounted_rwd_vec = discount_vec * rwd_vec
 	return discount_vec * rwd_vec
 
+
+
 # generates episode under policy; returns episode, episode_length
-def gen_episode(mdp, policy, policy_params, max_episode_length):
-	# TODO
-	pass
+def gen_episode(mdp, policy, max_episode_length):
+	# randomly choose initial state, action
+	state = rand_choice(mdp.state_space(initial=True))
+	action = policy.predict(state)
+
+	# episode so far
+	episode = []
+	# episode length so far (number of time-steps, not directly length of episode list)
+	episode_length = 0
+
+	while (episode_length < max_episode_length) and (not mdp.terminal_state(state)):
+		episode.append(state)
+		episode.append(action)
+		state, reward = mdp.successor(state, action)
+		episode.append(reward)
+		if not mdp.terminal_state(state):
+			action = policy.predict(state)
+
+		episode_length += 1
+
+	return torch.tensor(episode), episode_length
+
 
 
 	
@@ -71,8 +94,10 @@ def prob_under_policy(policy, action, state, policy_params)
 	pass
 
 
-
-
+# sets policy params to 'policy_params'
+def update_policy(policy, policy_params):
+	# TODO
+	pass
 
 
 
