@@ -43,19 +43,22 @@ def gen_episode(mdp, policy, policy_params, max_episode_length):
 	# TODO
 	pass
 
-	# pop off/update with each block in episode
-	while episode:
-		# pop off last rwd, action, state
-		reward = episode.pop()
-		action = episode.pop()
-		state = episode.pop()
-		G = (discount * G) + reward
+
 	
 
 # returns rwd_vec, action_vec, state_vec tensors
 def parse_episode(episode):
-	# TODO
-	pass
+
+	rwd_vec, action_vec, state_vec = [], [], []
+
+	# pop off/update with each block in episode
+	while episode:
+		# pop off last rwd, action, state
+		rwd_vec.append(episode.pop())
+		action_vec.append(episode.pop())
+		state_vec.append(episode.pop())
+
+	return torch.tensor(rwd_vec), torch.tensor(action_vec), torch.tensor(state_vec)
 
 # return gradient of equation (use autograd)
 def gradient_of(equation):
