@@ -44,7 +44,7 @@ class Reinforcer:
 
 
 	def sum_from_tp1(self, t, episode_length, rwd_vec):
-		discount_vec = torch.tensor([discount**i for i in range(t+1, episode_length)])
+		discount_vec = torch.tensor([self.discount**i for i in range(t+1, episode_length)])
 		discounted_rwd_vec = discount_vec * rwd_vec[t+1:]
 		return discounted_rwd_vec
 
