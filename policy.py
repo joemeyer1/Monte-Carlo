@@ -37,6 +37,10 @@ class Policy:
 	def update(self, params):
 		self.w1, self.w2, self.w3 = params
 
+	# returns policy parameters
+	def params(self):
+		return torch.tensor([self.w1, self.w2, self.w3])
+
 
 
 
