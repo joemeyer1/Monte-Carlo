@@ -107,6 +107,8 @@ class Maze:
 
 
 	def successor(self, state, action):
+		if action not in self.action_space(state):
+			action = (0, 0)
 		new_x, new_y = np.array(state)+np.array(action)
 		next_state = (new_x, new_y)
 		reward = self.maze[new_y][new_x]
