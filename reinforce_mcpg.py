@@ -20,13 +20,13 @@ class Reinforcer:
 		
 
 
-	def reinforce(self, discount, num_episodes=100, max_episode_length=100):
+	def reinforce(self):
 		# get parameters
 		policy_params = self.policy.params()
 
 		for i in range(num_episodes):
 			# episode is a list of form [state_0, action_0, reward_1, ... , state_t-1, action_t-1, reward_t]
-			episode, episode_length = self.gen_episode(max_episode_length)
+			episode, episode_length = self.gen_episode(self.max_episode_length)
 
 			rwd_vec, action_vec, state_vec = self.parse_episode(episode)
 			
@@ -51,7 +51,7 @@ class Reinforcer:
 
 
 	# generates episode under self.policy; returns episode, episode_length
-	def gen_episode(self, max_episode_length):
+	def gen_episode(self):
 		# randomly choose initial state, action
 		state = rand_choice(self.mdp.state_space(initial=True))
 		action = max_action(self.policy.predict(state))
@@ -61,7 +61,7 @@ class Reinforcer:
 		# episode length so far (number of time-steps, not directly length of episode list)
 		episode_length = 0
 
-		while (episode_length < max_episode_length) and (not self.mdp.terminal_state(state)):
+		while (episode_length < self.max_episode_length) and (not self.mdp.terminal_state(state)):
 			episode.append(state)
 			episode.append(action)
 			state, reward = self.mdp.successor(state, action)
