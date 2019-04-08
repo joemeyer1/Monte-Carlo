@@ -92,7 +92,7 @@ class Maze:
 			for end in self.end_states:
 				state_space.remove(end)
 
-		return state_space
+		return state_space.flatten()
 
 
 	def action_space(self, state):
