@@ -100,7 +100,7 @@ class Reinforcer:
 		return x.grad
 
 	# returns P(action | self.policy, policy_params, state)
-	def prob_under_policy(self, action, state)
+	def prob_under_policy(self, action, state):
 		action_vec = self.policy.predict(state)
 		action_index = self.index_of(action)
 		return action_vec[action_index]
