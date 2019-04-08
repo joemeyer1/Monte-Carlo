@@ -18,14 +18,16 @@ class Policy:
 
 
 	# input is tensor of same dtype as Policy weights
-	def __call__(self, input):
+	def __call__(self, input, params = None):
+		if not params:
+			params = self.params()
 		# first layer linear
-		result = input.mm(self.w1)
+		result = torch.mv(torch.t(self.w1), input)
 		# second layer relu
-		result = result.mm(self.w2)
+		result = torch.mv(torch.t(self.w2), result)
 		result = result.clamp(min=0)
 		# third layer relu
-		result = result.mm(self.w3)
+		result = torch.mv(torch.t(self.w3), result)
 		result = result.clamp(min=0)
 		# finally, softmax it
 		return softmax(result)
@@ -37,7 +39,7 @@ class Policy:
 
 	# returns policy parameters
 	def params(self):
-		return torch.stack(tensors = [self.w1, self.w2, self.w3])
+		return [self.w1, self.w2, self.w3]
 
 
 
@@ -46,7 +48,7 @@ class Policy:
 
 
 def softmax(ls):
-	tot = torch.sum([torch.exp(x) for x in ls])
+	tot = torch.sum(torch.tensor([torch.exp(x) for x in ls]))
 	return torch.tensor([torch.exp(x)/tot for x in ls])
 
 

@@ -3,6 +3,7 @@
 
 import random
 import torch
+from math import inf
 
 
 
@@ -24,19 +25,21 @@ class Reinforcer:
 		# get parameters
 		policy_params = self.policy.params()
 
-		for i in range(num_episodes):
+		for i in range(self.num_episodes):
 			# episode is a list of form [state_0, action_0, reward_1, ... , state_t-1, action_t-1, reward_t]
-			episode, episode_length = self.gen_episode(self.max_episode_length)
+			episode, episode_length = self.gen_episode()
 
 			rwd_vec, action_vec, state_vec = self.parse_episode(episode)
-			discount_vec = torch.tensor([self.discount**i for i in range(episode_length)])
+			discount_vec = torch.tensor([self.discount**i for i in range(episode_length)], dtype=torch.float)
 			
 
 			for t in range(episode_length):
 				G = torch.sum(self.discounted_rwds(rwd_vec, discount_vec, t, episode_length))
 				state_t = episode[t*3]
 				action_t = episode[(t*3) + 1]
-				policy_params += self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t)
+				param_update = self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t)
+				for i in range(len(policy_params)):
+					policy_params[i] += param_update[i]
 				self.update_policy(policy_params)
 
 
@@ -59,7 +62,7 @@ class Reinforcer:
 		episode_length = 0
 
 		while (episode_length < self.max_episode_length) and (not self.mdp.terminal_state(state)):
-			action_index = self.max_action(self.policy(state))
+			action_index = self.max_action(self.policy(torch.tensor(state, dtype=torch.float)))
 			action = self.mdp.get_action(state, action_index)
 			episode.append(state)
 			episode.append(action)
@@ -84,7 +87,7 @@ class Reinforcer:
 			action_vec.append(episode.pop())
 			state_vec.append(episode.pop())
 
-		return torch.tensor(rwd_vec), torch.tensor(action_vec), torch.tensor(state_vec)
+		return torch.tensor(rwd_vec, dtype = torch.float), torch.tensor(action_vec, dtype = torch.float), torch.tensor(state_vec, dtype = torch.float)
 
 
 	# returns vector of discounted rewards from time t+1
@@ -97,10 +100,12 @@ class Reinforcer:
 	def log_policy_gradient(self, state, action):
 		# convert action to index
 		action_index = self.index_of(action)
-		x = torch.tensor(state, requires_grad=True)
-		y = torch.log(self.policy(x)[action_index])
+		w1, w2, w3 = self.policy_params
+		w1.requires_grad, w2.requires_grad, w3.requires_grad = True, True, True
+		policy_params = [w1, w2, w3]
+		y = torch.log(self.policy(torch.tensor(state, dtype=torch.float), policy_params)[action_index])
 		y.backward()
-		return x.grad
+		return [w1.grad, w2.grad, w3.grad]
 
 
 	# sets self.policy params to 'policy_params'
@@ -127,6 +132,11 @@ class Reinforcer:
 	# returns integer index corresponding w action
 	def index_of(self, action, state):
 		return self.mdp.action_space(state).index(action)
+
+def rand_choice(ls):
+	if not ls:
+		return None
+	return random.choice(ls)
 
 
 

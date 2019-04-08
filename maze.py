@@ -104,7 +104,7 @@ class Maze:
 				actions.append(offset)
 		return actions
 
-	def get_action(state, action_index):
+	def get_action(self, state, action_index):
 		action_space = self.action_space(state)
 		if action_index < len(action_space):
 			return action_space[action_index]
