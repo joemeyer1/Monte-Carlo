@@ -37,8 +37,8 @@ def reinforce(mdp, policy, step_size, discount, num_params = 2**8, num_episodes=
 
 def sum_from_tp1(t, episode_length, rwd_vec):
 	discount_vec = torch.tensor([discount**i for i in range(t+1, episode_length)])
-	discounted_rwd_vec = discount_vec * rwd_vec
-	return discount_vec * rwd_vec
+	discounted_rwd_vec = discount_vec * rwd_vec[t+1:]
+	return discounted_rwd_vec
 
 
 
@@ -59,7 +59,8 @@ def gen_episode(mdp, policy, max_episode_length):
 		state, reward = mdp.successor(state, action)
 		episode.append(reward)
 		if not mdp.terminal_state(state):
-			action = max_action(policy.predict(state))
+			action_index = max_action(policy.predict(state))
+			action = mdp.get_action(state, action_index)
 
 		episode_length += 1
 
@@ -99,17 +100,16 @@ def prob_under_policy(policy, action, state)
 
 # sets policy params to 'policy_params'
 def update_policy(policy, policy_params):
-	# TODO
-	pass
+	policy.update(policy_params)
 
 
 # returns integer index corresponding w best action
 def max_action(action_vec):
-	best_action = None
+	best_action = [None]
 	best_value = -inf
 
-	for i in range(action_vec):
-		val = action_vec[i]
+	for action in range(len(action_vec)):
+		val = action_vec[action]
 		if val == best_value:
 			best_action.append(action)
 		elif val > best_value:
@@ -120,9 +120,8 @@ def max_action(action_vec):
 
 
 # returns integer index corresponding w action
-def index_of(action):
-	# TODO
-	pass
+def index_of(mdp, action, state):
+	return mdp.action_space(state).index(action)
 
 
 
