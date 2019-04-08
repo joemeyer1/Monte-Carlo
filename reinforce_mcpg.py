@@ -29,7 +29,7 @@ class Reinforcer:
 			# episode is a list of form [state_0, action_0, reward_1, ... , state_t-1, action_t-1, reward_t]
 			episode, episode_length = self.gen_episode()
 
-			rwd_vec, action_vec, state_vec = self.parse_episode(episode)
+			rwd_vec, action_vec, state_vec = self.parse_episode(episode.copy())
 			discount_vec = torch.tensor([self.discount**i for i in range(episode_length)], dtype=torch.float)
 			
 
