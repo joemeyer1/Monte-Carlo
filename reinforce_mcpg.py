@@ -54,7 +54,7 @@ class Reinforcer:
 	def gen_episode(self):
 		# randomly choose initial state, action
 		state = rand_choice(self.mdp.state_space(initial=True))
-		action = max_action(self.policy.predict(state))
+		action = self.max_action(self.policy.predict(state))
 
 		# episode so far
 		episode = []
@@ -67,12 +67,12 @@ class Reinforcer:
 			state, reward = self.mdp.successor(state, action)
 			episode.append(reward)
 			if not self.mdp.terminal_state(state):
-				action_index = max_action(self.policy.predict(state))
+				action_index = self.max_action(self.policy.predict(state))
 				action = self.mdp.get_action(state, action_index)
 
 			episode_length += 1
 
-		return torch.tensor(episode), episode_length
+		return episode, episode_length
 
 
 
@@ -102,7 +102,7 @@ class Reinforcer:
 	# returns P(action | self.policy, policy_params, state)
 	def prob_under_policy(self, action, state)
 		action_vec = self.policy.predict(state)
-		action_index = index_of(action)
+		action_index = self.index_of(action)
 		return action_vec[action_index]
 
 
