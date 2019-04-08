@@ -29,10 +29,11 @@ class Reinforcer:
 			episode, episode_length = self.gen_episode(self.max_episode_length)
 
 			rwd_vec, action_vec, state_vec = self.parse_episode(episode)
+			discount_vec = torch.tensor([self.discount**i for i in range(episode_length)])
 			
 
 			for t in range(episode_length):
-				G, action_t, state_t = self.sum_from_tp1(t, episode_length, rwd_vec)
+				G, action_t, state_t = self.discounted_rwds(rwd_vec, discount_vec, t, episode_length)
 				policy_params += self.step_size * (self.discount**t) * G * self.gradient_of( math.log( self.prob_under_policy(action_t, state_t) ) )
 				self.update_policy(policy_params)
 
@@ -42,12 +43,7 @@ class Reinforcer:
 
 
 
-
-	def sum_from_tp1(self, t, episode_length, rwd_vec):
-		discount_vec = torch.tensor([self.discount**i for i in range(t+1, episode_length)])
-		discounted_rwd_vec = discount_vec * rwd_vec[t+1:]
-		return discounted_rwd_vec
-
+	# HELPERS for self.reinforce() :
 
 
 	# generates episode under self.policy; returns episode, episode_length
@@ -74,8 +70,6 @@ class Reinforcer:
 
 
 
-		
-
 	# returns rwd_vec, action_vec, state_vec tensors
 	def parse_episode(self, episode):
 
@@ -89,6 +83,13 @@ class Reinforcer:
 			state_vec.append(episode.pop())
 
 		return torch.tensor(rwd_vec), torch.tensor(action_vec), torch.tensor(state_vec)
+
+
+	def discounted_rwds(self, rwd_vec, discount_vec, t, episode_length):
+		discounted_rwd_vec = discount_vec[:episode_length - (t+1)] * rwd_vec[t+1:]
+		return discounted_rwd_vec
+
+
 
 	# return gradient of equation (use autograd)
 	def gradient_of(self, equation, point):
