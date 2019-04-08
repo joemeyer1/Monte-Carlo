@@ -36,7 +36,7 @@ class Reinforcer:
 				G = torch.sum(self.discounted_rwds(rwd_vec, discount_vec, t, episode_length))
 				state_t = episode[t*3]
 				action_t = episode[(t*3) + 1]
-				policy_params += self.step_size * (self.discount**t) * G * self.gradient_of( math.log( self.prob_under_policy(action_t, state_t) ) )
+				policy_params += self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t)
 				self.update_policy(policy_params)
 
 
@@ -87,24 +87,20 @@ class Reinforcer:
 		return torch.tensor(rwd_vec), torch.tensor(action_vec), torch.tensor(state_vec)
 
 
+	# returns vector of discounted rewards from time t+1
 	def discounted_rwds(self, rwd_vec, discount_vec, t, episode_length):
 		discounted_rwd_vec = discount_vec[:episode_length - (t+1)] * rwd_vec[t+1:]
 		return discounted_rwd_vec
 
 
-
-	# return gradient of equation (use autograd)
-	def gradient_of(self, equation, point):
-		x = torch.tensor(point, requires_grad=True)
-		y = equation(x)
+	# return gradient of P(action under policy) at state (use autograd)
+	def log_policy_gradient(self, state, action):
+		# convert action to index
+		action_index = self.index_of(action)
+		x = torch.tensor(state, requires_grad=True)
+		y = torch.log(self.policy(x)[action_index])
 		y.backward()
 		return x.grad
-
-	# returns P(action | self.policy, policy_params, state)
-	def prob_under_policy(self, action, state):
-		action_vec = self.policy(state)
-		action_index = self.index_of(action)
-		return action_vec[action_index]
 
 
 	# sets self.policy params to 'policy_params'
