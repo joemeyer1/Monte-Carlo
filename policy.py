@@ -11,7 +11,7 @@ class Policy:
 		# w1: in(D_in) - linear -> H
 		self.w1 = torch.randn(D_in, H, dtype=dtype)
 		# w2: H - relu -> H
-		self.w2 = torch.randn(D_in, H, dtype=dtype)
+		self.w2 = torch.randn(H, H, dtype=dtype)
 		# w3: H - linear -> D_out
 		self.w3 = torch.randn(H, D_out, dtype=dtype)
 		# during computation we will then run results through softmax
