@@ -33,7 +33,9 @@ class Reinforcer:
 			
 
 			for t in range(episode_length):
-				G, action_t, state_t = self.discounted_rwds(rwd_vec, discount_vec, t, episode_length)
+				G = torch.sum(self.discounted_rwds(rwd_vec, discount_vec, t, episode_length))
+				state_t = episode[t*3]
+				action_t = episode[(t*3) + 1]
 				policy_params += self.step_size * (self.discount**t) * G * self.gradient_of( math.log( self.prob_under_policy(action_t, state_t) ) )
 				self.update_policy(policy_params)
 
