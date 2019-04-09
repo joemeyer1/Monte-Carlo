@@ -37,7 +37,7 @@ class Reinforcer:
 				G = torch.sum(self.discounted_rwds(rwd_vec, discount_vec, t, episode_length))
 				state_t = episode[t*3]
 				action_t = episode[(t*3) + 1]
-				param_update = self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t)
+				param_update = self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t, policy_params)
 				for i in range(len(policy_params)):
 					policy_params[i] += param_update[i]
 				self.update_policy(policy_params)
@@ -97,10 +97,10 @@ class Reinforcer:
 
 
 	# return gradient of P(action under policy) at state (use autograd)
-	def log_policy_gradient(self, state, action):
+	def log_policy_gradient(self, state, action, policy_params):
 		# convert action to index
-		action_index = self.index_of(action)
-		w1, w2, w3 = self.policy_params
+		action_index = self.index_of(action, state)
+		w1, w2, w3 = policy_params
 		w1.requires_grad, w2.requires_grad, w3.requires_grad = True, True, True
 		policy_params = [w1, w2, w3]
 		y = torch.log(self.policy(torch.tensor(state, dtype=torch.float), policy_params)[action_index])
