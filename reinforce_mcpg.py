@@ -35,9 +35,9 @@ class Reinforcer:
 
 			for t in range(episode_length):
 				G = torch.sum(self.discounted_rwds(rwd_vec, discount_vec, t, episode_length))
-				state_t = episode[t*3]
-				action_t = episode[(t*3) + 1]
-				param_update = self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t, policy_params)
+				state_t = state_vec[t]
+				action_t = action_vec[t]
+				param_update = self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t, policy_params.copy())
 				for i in range(len(policy_params)):
 					policy_params[i] += param_update[i]
 				self.update_policy(policy_params)
@@ -65,7 +65,7 @@ class Reinforcer:
 			action_index = self.max_action(self.policy(torch.tensor(state, dtype=torch.float)))
 			action = self.mdp.get_action(state, action_index)
 			episode.append(state)
-			episode.append(action)
+			episode.append(action_index)
 			state, reward = self.mdp.successor(state, action)
 			episode.append(reward)
 
@@ -99,11 +99,12 @@ class Reinforcer:
 	# return gradient of P(action under policy) at state (use autograd)
 	def log_policy_gradient(self, state, action, policy_params):
 		# convert action to index
-		action_index = self.index_of(action, state)
+		action_index = self.normalize_action(action, state)
 		w1, w2, w3 = policy_params
-		w1.requires_grad, w2.requires_grad, w3.requires_grad = True, True, True
-		policy_params = [w1, w2, w3]
-		y = torch.log(self.policy(torch.tensor(state, dtype=torch.float), policy_params)[action_index])
+		w1.requires_grad_(True)
+		w2.requires_grad_(True)
+		w3.requires_grad_(True)
+		y = torch.log(self.policy(torch.tensor(state, dtype=torch.float), [w1, w2, w3])[action_index])
 		y.backward()
 		return [w1.grad, w2.grad, w3.grad]
 
@@ -129,9 +130,17 @@ class Reinforcer:
 		return random.choice(best_action)
 
 
-	# returns integer index corresponding w action
-	def index_of(self, action, state):
-		return self.mdp.action_space(state).index(action)
+	# if the action is invalid this makes it '-1' instead of 'None'
+	# allows for its inclusion in tensor
+	def normalize_action(self,action, state):
+		valid_action = action in range(0, len(self.mdp.action_space(state)))
+		if not valid_action:
+			action = torch.tensor([-1])
+		return action.int().item()
+
+	# # returns integer index corresponding w action
+	# def index_of(self, action, state):
+	# 	return self.mdp.action_space(state).index(action)
 
 def rand_choice(ls):
 	if not ls:

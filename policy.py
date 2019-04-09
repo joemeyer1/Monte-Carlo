@@ -21,13 +21,14 @@ class Policy:
 	def __call__(self, input, params = None):
 		if not params:
 			params = self.params()
+		w1, w2, w3 = params
 		# first layer linear
-		result = torch.mv(torch.t(self.w1), input)
+		result = torch.mv(torch.t(w1), input)
 		# second layer relu
-		result = torch.mv(torch.t(self.w2), result)
+		result = torch.mv(torch.t(w2), result)
 		result = result.clamp(min=0)
 		# third layer relu
-		result = torch.mv(torch.t(self.w3), result)
+		result = torch.mv(torch.t(w3), result)
 		result = result.clamp(min=0)
 		# finally, softmax it
 		return softmax(result)
