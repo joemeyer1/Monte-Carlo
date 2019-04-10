@@ -104,7 +104,7 @@ class Reinforcer:
 		w1.requires_grad_(True)
 		w2.requires_grad_(True)
 		w3.requires_grad_(True)
-		y = torch.log(self.policy(torch.tensor(state, dtype=torch.float), [w1, w2, w3])[action_index])
+		y = torch.log(self.policy(state.float(), [w1, w2, w3])[action_index])
 		y.backward()
 		return [w1.grad, w2.grad, w3.grad]
 
