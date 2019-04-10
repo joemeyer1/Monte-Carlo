@@ -16,12 +16,6 @@ class Policy:
 		self.w3 = torch.randn(H, D_out, dtype=datatype)
 		# during computation we will then run results through softmax
 
-		self.model = torch.nn.Sequential(
-		    torch.nn.Linear(D_in, H),
-		    torch.nn.ReLU(),
-		    torch.nn.Linear(H, D_out),
-		)
-
 
 	# state is tensor of same dtype as Policy weights
 	def __call__(self, state, params = None):
