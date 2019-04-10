@@ -38,12 +38,13 @@ class Reinforcer:
 				state_t = state_vec[t]
 				action_t = action_vec[t]
 				param_update = self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t, policy_params.copy())
-				for i in range(len(policy_params)):
-					policy_params[i] += param_update[i]
-				self.update_policy(policy_params)
+				with torch.no_grad():
+					for i in range(len(policy_params)):
+						policy_params[i] += param_update[i]
+					self.update_policy(policy_params)
 
 
-		return self.policy, policy_params
+		return self.policy
 
 
 
@@ -62,7 +63,7 @@ class Reinforcer:
 		episode_length = 0
 
 		while (episode_length < self.max_episode_length) and (not self.mdp.terminal_state(state)):
-			action_index = self.max_action(self.policy(torch.tensor(state, dtype=torch.float)))
+			action_index = self.max_action(self.policy.model(torch.tensor(state, dtype=torch.float)))
 			action = self.mdp.get_action(state, action_index)
 			episode.append(state)
 			episode.append(action_index)
@@ -104,9 +105,17 @@ class Reinforcer:
 		w1.requires_grad_(True)
 		w2.requires_grad_(True)
 		w3.requires_grad_(True)
-		y = torch.log(self.policy(state.float(), [w1, w2, w3])[action_index])
+		self.update_policy([w1,w2,w3])
+		self.policy.model.zero_grad()
+		y = torch.log(self.policy.model(state.float())[action_index])
+		with torch.no_grad():
+			# zero gradients if they are 'none'
+			w1grad = self.normalize_grad(w1.grad)
+			w2grad = self.normalize_grad(w2.grad)
+			w3grad = self.normalize_grad(w3.grad)
+
 		y.backward()
-		return [w1.grad, w2.grad, w3.grad]
+		return torch.tensor([w1grad, w2grad, w3grad], dtype=torch.float)
 
 
 	# sets self.policy params to 'policy_params'
@@ -135,8 +144,13 @@ class Reinforcer:
 	def normalize_action(self,action, state):
 		valid_action = action in range(0, len(self.mdp.action_space(state)))
 		if not valid_action:
-			action = torch.tensor([-1])
-		return action.int().item()
+			return 0
+		return action
+
+	def normalize_grad(self, grad):
+		if grad:
+			return grad
+		return torch.tensor([0.])
 
 	# # returns integer index corresponding w action
 	# def index_of(self, action, state):
