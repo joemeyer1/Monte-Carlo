@@ -37,13 +37,14 @@ class Reinforcer:
 				G = torch.sum(self.discounted_rwds(rwd_vec, discount_vec, t, episode_length))
 				state_t = state_vec[t]
 				action_t = action_vec[t]
-				param_update = self.step_size * (self.discount**t) * G * self.log_policy_gradient(state_t, action_t, policy_params.copy())
-				for i in range(len(policy_params)):
-					policy_params[i] += param_update[i]
-				self.update_policy(policy_params)
+				param_update = [self.step_size * (self.discount**t) * G * lpg for lpg in self.log_policy_gradient(state_t, action_t, policy_params.copy())]
+				with torch.no_grad():
+					for i in range(len(policy_params)):
+						policy_params[i] += param_update[i]
+					self.update_policy(policy_params)
 
 
-		return self.policy, policy_params
+		return self.policy
 
 
 
@@ -116,7 +117,7 @@ class Reinforcer:
 
 	# returns integer index corresponding w best action
 	def max_action(self, action_vec):
-		best_action = [None]
+		best_action = [-1]
 		best_value = -inf
 
 		for action in range(len(action_vec)):

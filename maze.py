@@ -20,7 +20,7 @@ SMALL_TERMINAL = [(2,2)]
 ONE_PATH_MAZE = \
 		[[0,0, -4, 0, 0, 0, 0],
 		[-1,1, 1, 2, 0, 0, 0],
-		[0, -2, 0, 4, 8, 16,0],
+		[-1, -2, 0, 4, 8, 16,0],
 		[0,  0,-4, 0, 0, 32,0],
 		[0,  0, 0,-8, 0, 64,0],
 		[0,  0, 0, 0,-16, 0,0]]		
@@ -30,7 +30,7 @@ def one_path_terminal():
 	# so compile list of all states
 	one_path_term = [(x, y) for x in range(len(ONE_PATH_MAZE[0])) for y in range(len(ONE_PATH_MAZE))]
 	# then remove the non-terminal ones
-	path_non_term = [(0,0), (1,0), (1, 1), (2, 1), (3, 1), (2,2), (3, 2), (4, 2), (5, 2), (5, 3)]
+	path_non_term = [(0,1),(0,2),(0,0), (1,0), (1, 1), (2, 1), (3, 1), (2,2), (3, 2), (4, 2), (5, 2), (5, 3)]
 	for nont in path_non_term:
 		one_path_term.remove(nont)
 	return one_path_term
@@ -106,7 +106,7 @@ class Maze:
 
 	def get_action(self, state, action_index):
 		action_space = self.action_space(state)
-		if action_index < len(action_space):
+		if action_index in range(0, len(action_space)):
 			return action_space[action_index]
 		else:
 			return None

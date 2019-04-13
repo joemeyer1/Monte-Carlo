@@ -18,20 +18,24 @@ class Policy:
 
 
 	# state is tensor of same dtype as Policy weights
-	def __call__(self, state, params = None):
+	def __call__(self, state, params = None, sh=True):
 		if not params:
 			params = self.params()
 		w1, w2, w3 = params
 		# first layer linear
 		result = torch.mv(torch.t(w1), state)
+		if not sh: print("res1:", result)
 		# second layer relu
 		result = torch.mv(torch.t(w2), result)
-		# with torch.no_grad():
+		if not sh: print("res2:", result)
 		result = result.clamp(min=0)
+		if not sh: print("res3:", result)
 		# third layer relu
 		result = torch.mv(torch.t(w3), result)
-		# with torch.no_grad():
+		if not sh: print("res4:", result)
 		result = result.clamp(min=0)
+		if not sh: print("res5:", result)
+		if not sh: print("res6:", softmax(result))
 		# finally, softmax it
 		return softmax(result)
 
@@ -51,8 +55,10 @@ class Policy:
 
 
 def softmax(ls):
-	tot = torch.sum(torch.tensor([torch.exp(x) for x in ls]))
-	return torch.tensor([torch.exp(x)/tot for x in ls])
+	tot = torch.sum(torch.exp(ls))
+	ftot = torch.tensor([tot,tot,tot,tot], dtype=ls.dtype)
+	return torch.exp(ls)/ftot
+	# return torch.tensor([torch.exp(x)/tot for x in ls])
 
 
 
