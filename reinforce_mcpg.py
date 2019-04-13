@@ -13,7 +13,7 @@ from math import inf
 # policy: a nn with initially randomized paramters
 
 class Reinforcer:
-	def __init__(self, mdp, policy, step_size, discount, num_episodes=100, max_episode_length=100):
+	def __init__(self, mdp, policy, step_size, discount, num_episodes=200, max_episode_length=100):
 		self.mdp = mdp
 		self.policy = policy
 		self.step_size, self.discount = step_size, discount
