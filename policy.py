@@ -35,9 +35,9 @@ class Policy:
 		if not sh: print("res4:", result)
 		result = result.clamp(min=0)
 		if not sh: print("res5:", result)
-		if not sh: print("res6:", softmax(result))
+		if not sh: print("res6:", torch.nn.functional.softmax(result))
 		# finally, softmax it
-		return softmax(result)
+		return torch.nn.functional.softmax(result, dim=result.dim()-1)
 
 
 	# params is a tensor of initial policy parameters
@@ -54,10 +54,6 @@ class Policy:
 
 
 
-def softmax(tens):
-    
-    t = torch.stack([torch.stack([torch.sum(torch.exp(x))]) for x in tens])
-    return torch.exp(tens)/t
 
 
 
