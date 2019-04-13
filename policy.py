@@ -54,11 +54,10 @@ class Policy:
 
 
 
-def softmax(ls):
-	tot = torch.sum(torch.exp(ls))
-	ftot = torch.tensor([tot,tot,tot,tot], dtype=ls.dtype)
-	return torch.exp(ls)/ftot
-	# return torch.tensor([torch.exp(x)/tot for x in ls])
+def softmax(tens):
+    
+    t = torch.stack([torch.stack([torch.sum(torch.exp(x))]) for x in tens])
+    return torch.exp(tens)/t
 
 
 
