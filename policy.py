@@ -8,7 +8,7 @@ class Policy:
 
 
 	def __init__(self, D_in, D_out, H, datatype=torch.float):
-		# w1: in(D_in) - linear -> H
+		# w1: in(D_in) - sigmoid -> H
 		self.w1 = torch.randn(D_in, H, dtype=datatype)
 		# w2: H - relu -> H
 		self.w2 = torch.randn(H, H, dtype=datatype)
@@ -22,8 +22,9 @@ class Policy:
 		if not params:
 			params = self.params()
 		w1, w2, w3 = params
-		# first layer linear
+		# first layer sigmoid
 		result = torch.mv(torch.t(w1), state)
+		result = torch.sigmoid(result)
 		# second layer relu
 		result = torch.mv(torch.t(w2), result)
 		result = result.clamp(min=0)
