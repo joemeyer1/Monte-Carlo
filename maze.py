@@ -22,7 +22,7 @@ ONE_PATH_MAZE = \
 		[-1,1, 1, 2, 0, 0, 0],
 		[-1, -2, 0, 4, 8, 16,0],
 		[0,  0,-4, 0, 0, 32,0],
-		[0,  0, 0,-8, 0, 64,0],
+		[0,  0, 0,-8, 0, 2**10,0],
 		[0,  0, 0, 0,-16, 0,0]]		
 
 def one_path_terminal():
@@ -35,7 +35,10 @@ def one_path_terminal():
 		one_path_term.remove(nont)
 	return one_path_term
 
-ONE_PATH_TERMINAL = one_path_terminal()
+def one_path_term2():
+	return (5,4)
+
+ONE_PATH_TERMINAL = one_path_term2()
 
 
 

@@ -13,7 +13,7 @@ from math import inf
 # policy: a nn with initially randomized paramters
 
 class Reinforcer:
-	def __init__(self, mdp, policy, step_size, discount, num_episodes=200, max_episode_length=100):
+	def __init__(self, mdp, policy, step_size, discount, num_episodes=500, max_episode_length=200):
 		self.mdp = mdp
 		self.policy = policy
 		self.step_size, self.discount = step_size, discount
@@ -63,7 +63,7 @@ class Reinforcer:
 		episode_length = 0
 
 		while (episode_length < self.max_episode_length) and (not self.mdp.terminal_state(state)):
-			action_index = self.max_action(self.policy(torch.tensor(state, dtype=torch.float)))
+			action_index = self.max_action(self.policy(torch.tensor(state, dtype=torch.float)), state)
 			action = self.mdp.get_action(state, action_index)
 			episode.append(state)
 			episode.append(action_index)
@@ -116,17 +116,19 @@ class Reinforcer:
 
 
 	# returns integer index corresponding w best action
-	def max_action(self, action_vec):
+	def max_action(self, action_vec, state):
 		best_action = [-1]
 		best_value = -inf
 
 		for action in range(len(action_vec)):
 			val = action_vec[action]
-			if val == best_value:
-				best_action.append(action)
-			elif val > best_value:
-				best_action = [action]
-				best_value = val
+			action_tup = self.mdp.get_action(state, action)
+			if action_tup in self.mdp.action_space(state):
+				if val == best_value:
+					best_action.append(action)
+				elif val > best_value:
+					best_action = [action]
+					best_value = val
 
 		return random.choice(best_action)
 
