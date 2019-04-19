@@ -36,7 +36,7 @@ def one_path_terminal():
 	return one_path_term
 
 def one_path_term2():
-	return (5,4)
+	return [(5,4)]
 
 ONE_PATH_TERMINAL = one_path_term2()
 

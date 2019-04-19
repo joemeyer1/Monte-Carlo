@@ -22,14 +22,12 @@ class Reinforcer:
 
 
 	def reinforce(self):
-		# get parameters
-		policy_params = self.policy.params()
 
 		for i in range(self.num_episodes):
 			# episode is a list of form [state_0, action_0, reward_1, ... , state_t-1, action_t-1, reward_t]
 			episode, episode_length = self.gen_episode()
 
-			rwd_vec, action_vec, state_vec = self.parse_episode(episode.copy())
+			rwd_vec, action_vec, state_vec = self.parse_episode(episode)
 			discount_vec = torch.tensor([self.discount**i for i in range(episode_length)], dtype=torch.float)
 			
 
@@ -37,11 +35,16 @@ class Reinforcer:
 				G = torch.sum(self.discounted_rwds(rwd_vec, discount_vec, t, episode_length))
 				state_t = state_vec[t]
 				action_t = action_vec[t]
-				param_update = [self.step_size * (self.discount**t) * G * lpg for lpg in self.policy.log_policy_gradient(state_t, action_t, policy_params.copy(), self.mdp)]
+				param_update = [self.step_size * (self.discount**t) * G * lpg for lpg in self.policy.log_policy_gradient(state_t, action_t, self.mdp)]
+				# get policy parameters
+				policy_params = self.policy.layer_weights
+				# update them
 				with torch.no_grad():
 					for i in range(len(policy_params)):
 						policy_params[i] += param_update[i]
 					self.update_policy(policy_params)
+
+			print(".", end='')
 
 
 		return self.policy
