@@ -49,7 +49,7 @@ class Tetris:
     # USER FUNCTIONS:
 
     def print_board(self):
-        print(self.full_board())
+        print(self.full_board(), '\n')
 
 
     # moves time fwd 1 step
@@ -67,11 +67,11 @@ class Tetris:
         else:
             # move shape down 1
             self.shape_loc[0] += 1
-        self.print_board()
 
     def take_action(self, action):
-        self.ACTION_MAP[action]()
-        self.step()
+        if action != 'p':
+            self.ACTION_MAP[action]()
+            self.step()
 
 
 
@@ -85,7 +85,6 @@ class Tetris:
             if (not 0 <= x < self.width) or (y >= 0 and self.ground[y][x]):
                 self.shape_position = (self.shape_position - 1) % 4
                 break
-        self.print_board()
 
     # moves shape left 1
     def left(self):
@@ -120,7 +119,6 @@ class Tetris:
                 break
         if can_move:
             self.shape_loc[1] += direction_offset
-        self.print_board()
 
     # returns ground+active_squares
     def full_board(self):
