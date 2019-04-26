@@ -13,11 +13,12 @@ from math import inf
 # policy: a nn with initially randomized paramters
 
 class Reinforcer:
-	def __init__(self, mdp, policy, step_size, discount, num_episodes=500, max_episode_length=200):
+	def __init__(self, mdp, policy, step_size, discount, num_episodes=500, max_episode_length=200, verbose=False):
 		self.mdp = mdp
 		self.policy = policy
 		self.step_size, self.discount = step_size, discount
 		self.num_episodes, self.max_episode_length = num_episodes, max_episode_length
+		self.verbose = verbose
 		
 
 
@@ -44,7 +45,10 @@ class Reinforcer:
 						policy_params[i] += param_update[i]
 					self.update_policy(policy_params)
 
-			print(".", end='')
+			if self.verbose:
+				print(state_vec)
+			else:
+				print(".", end='')
 
 
 		return self.policy
