@@ -100,7 +100,7 @@ class Reinforcer:
 
 	# returns vector of discounted rewards from time t+1
 	def discounted_rwds(self, rwd_vec, discount_vec, t, episode_length):
-		discounted_rwd_vec = discount_vec[:episode_length - (t+1)] * rwd_vec[t+1:]
+		discounted_rwd_vec = discount_vec[:episode_length - (t)] * rwd_vec[t:]
 		return discounted_rwd_vec
 
 

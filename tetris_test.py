@@ -11,11 +11,11 @@ def main(visualize=False):
 	# make policy
 	D_in = len(mdp.get_state())
 	D_out = 4
-	H = 500
-	M = 50
+	H = 64
+	M = 3
 	pol = Policy(D_in, D_out, H, M)
-	step_size = .5
-	discount = .99999999
+	step_size = .1
+	discount = .999
 	num_episodes=100000
 	max_episode_length=50000
 
