@@ -18,24 +18,27 @@ SMALL_TERMINAL = [(2,2)]
 
 
 ONE_PATH_MAZE = \
-		[[0,0, -4, 0, 0, 0, 0],
-		[-1,1, 1, 2, 0, 0, 0],
-		[0, -2, 0, 4, 8, 16,0],
-		[0,  0,-4, 0, 0, 32,0],
-		[0,  0, 0,-8, 0, 64,0],
-		[0,  0, 0, 0,-16, 0,0]]		
+		[[-1,-1, -4, -1, -1, -1, -1],
+		[-1,  1,  1,  2, -1, -1, -1],
+		[-1, -2, -1,  4,  8, 16, -1],
+		[-1, -1, -4, -1, -1, 32, -1],
+		[-1, -1, -1, -8, -1, 2**9,-1],
+		[-1, -1, -1, -1, -16, -1, -1]]		
 
 def one_path_terminal():
 	# For one-path, most states are terminal
 	# so compile list of all states
 	one_path_term = [(x, y) for x in range(len(ONE_PATH_MAZE[0])) for y in range(len(ONE_PATH_MAZE))]
 	# then remove the non-terminal ones
-	path_non_term = [(0,0), (1,0), (1, 1), (2, 1), (3, 1), (2,2), (3, 2), (4, 2), (5, 2), (5, 3)]
+	path_non_term = [(0,1),(0,2),(0,0), (1,0), (1, 1), (2, 1), (3, 1), (2,2), (3, 2), (4, 2), (5, 2), (5, 3)]
 	for nont in path_non_term:
 		one_path_term.remove(nont)
 	return one_path_term
 
-ONE_PATH_TERMINAL = one_path_terminal()
+def one_path_term2():
+	return [(5,4)]
+
+ONE_PATH_TERMINAL = one_path_term2()
 
 
 
@@ -92,7 +95,7 @@ class Maze:
 			for end in self.end_states:
 				state_space.remove(end)
 
-		return state_space
+		return state_space.flatten()
 
 
 	def action_space(self, state):
@@ -104,9 +107,18 @@ class Maze:
 				actions.append(offset)
 		return actions
 
+	def get_action(self, state, action_index):
+		action_space = self.action_space(state)
+		if action_index in range(0, len(action_space)):
+			return action_space[action_index]
+		else:
+			return None
+
 
 
 	def successor(self, state, action):
+		if action not in self.action_space(state):
+			action = (0, 0)
 		new_x, new_y = np.array(state)+np.array(action)
 		next_state = (new_x, new_y)
 		reward = self.maze[new_y][new_x]

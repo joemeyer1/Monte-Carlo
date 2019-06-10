@@ -1,47 +1,66 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Apr 19 20:55:30 2019
 
-import maze
-import monte_carlo
+@author: joe
+"""
 
-# get mdp
-mdp = maze.Maze()
-
-# run monte-carlo
-def run():
-	return monte_carlo.monte_carlo(mdp)
-
-policy_map, q_val_map = run()
-simple_q_val_map = {key:q_val_map[key][0] for key in q_val_map}
-
-
-def print_episode():
-	return monte_carlo.gen_episode(mdp, policy_map, max_episode_length=20, epsilon=0)
-
-def print_episode_states(episode=print_episode()[0]):
-	states = []
-	i = 0
-	while i < len(episode):
-		states.append(episode[i])
-		i += 3
-	rwd = episode[-1]
-	return states, rwd
-
-def avg_reward(runs = 2, episodes = 1):
-	tot_rwd = 0
-	for r in range(runs):
-		run()
-		for i in range(episodes):
-			tot_rwd += print_episode_states()[1]
-	return tot_rwd/float(episodes*runs)
+from maze import Maze
+from policy import Policy
+from reinforce_mcpg import Reinforcer
+import torch
+import random
 
 
 
-# shortcuts:
-
-# p for convenience
-p = print_episode
-# ps for convenience
-ps = print_episode_states
-# pol, q for convenience
-pol, q = policy_map, q_val_map
-# a for convenience
-a = avg_reward
+class Tester:
+    def __init__(self):
+        self.main()
+        
+    def main(self):
+        self.maze = Maze()
+        self.make_policy()
+        self.make_reinforcer()
+        self.reinforce()
+        self.evaluate()
+        
+        
+        
+    def make_policy(self):
+        in_dim = 2
+        out_dim = 4
+        H = 64
+        non_io_hidden_layers = 5
+        self.policy = Policy(in_dim, out_dim, H, non_io_hidden_layers)
+    
+    def make_reinforcer(self):
+        step_size = .1
+        discount = .9
+        self.reinforcer = Reinforcer(self.maze, self.policy, step_size, discount)
+        
+    def reinforce(self):
+        self.policy = self.reinforcer.reinforce()
+        print("policy:",self.policy)
+        
+    def evaluate(self):
+        init_state = random.choice(self.maze.state_space(initial=True))
+        
+        state = init_state
+        print("initial state:", state)
+        for i in range(200):
+            if not self.maze.terminal_state(state):
+                state_t = torch.tensor(state, dtype=torch.float)
+                action_vec = self.policy(state_t)
+                print("action vec:", action_vec)
+                action_index = self.reinforcer.max_action(action_vec, state)
+                print("action_index:", action_index)
+                action = self.maze.get_action(state, action_index)
+                state = self.maze.successor(state, action)[0]
+                print("state:", state)
+            else:
+                print("terminal state found")
+                break
+        
+    
+t = Tester()

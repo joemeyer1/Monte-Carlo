@@ -1,2 +1,2 @@
 # Monte-Carlo
-simple monte carlo implementation (currently tabular; I hope to implement a gradient/deep-rl version later)
+Simple tabular (master branch) and policy (reinforce-mcpg branch) monte carlo implementation. Pseudocode for MCTS also included (mcts branch). TODO: Adapt MCTS pseudocode for gradient RL
